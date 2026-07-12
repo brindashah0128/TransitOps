@@ -38,7 +38,7 @@ Every asset, ledger sheet, and calculation has been fully localized to conform t
 ```bash
 ├── server.ts                 # Main full-stack Express server containing REST APIs & Gemini models
 ├── package.json              # Global dependency managers & build instructions
-├── .env.example              # Secret key template (e.g., GEMINI_API_KEY)
+├── .env           # Secret key template (e.g., GEMINI_API_KEY)
 └── frontend/                 # Complete frontend directory served statically by Express
     ├── index.html            # Main operator secure entry login portal
     ├── dashboard.html        # Main overview: high-priority metrics (₹), dynamic maps, live suggestions
@@ -78,9 +78,8 @@ npm install
 ```
 
 ### 3. Setting Up API Keys & Variables
-Create a local `.env` file in your root folder by copying `.env.example`:
 ```bash
-cp .env.example .env
+cp .env
 ```
 Inside `.env`, populate your Gemini API Key to enable the live smart co-pilot:
 ```env
