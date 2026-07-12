@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransitOps AI - System Analytics</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Custom stylesheet link -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#0F172A] text-slate-100 font-sans">
+  
+  <div id="layout-wrapper" class="flex min-h-screen">
+    <main id="main-content" class="flex-1 p-6 space-y-6">
+      
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+            System Analytics & Reporting
+          </h1>
+          <p class="text-xs text-slate-400 mt-1">Generate dynamic operational reports, review route segment densities, and audit fleet diagnostics parameters.</p>
+        </div>
+
+        <div class="flex gap-2">
+          <button id="export-pdf-btn" class="flex items-center gap-2 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold transition duration-150">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Export PDF</span>
+          </button>
+          <button id="export-csv-btn" class="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-md transition duration-150">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>Export CSV Ledger</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Propulsion Filter Rail -->
+      <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-4 shadow-lg">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Operational Parameter Controls</span>
+        <div class="flex items-center gap-3">
+          <select id="propulsion-selector" class="bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none w-48">
+            <option value="all">Propulsion: Unified</option>
+            <option value="electric">Propulsion: EV Class-8 Only</option>
+            <option value="diesel">Propulsion: Diesel Freight Only</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Charts Matrix -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Fleet Mileage Bar Compare -->
+        <div class="lg:col-span-8 bg-[#1E293B] border border-slate-800 p-5 rounded-xl shadow-2xl space-y-4">
+          <span class="text-sm font-bold text-slate-200 block">Propulsion Mileage Bar Chart (k Miles)</span>
+          <div class="h-64">
+            <canvas id="propulsion-mileage-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Radar Diagnostic parameters -->
+        <div class="lg:col-span-4 bg-[#1E293B] border border-slate-800 p-5 rounded-xl shadow-2xl flex flex-col justify-between h-[328px]">
+          <span class="text-sm font-bold text-slate-200 block border-b border-slate-800 pb-2">Fleet Metric Score Matrix</span>
+          <div class="flex-1 relative flex items-center justify-center p-4">
+            <canvas id="metrics-radar-chart" class="max-h-52"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Lower Segment Breakdown Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="bg-[#1E293B] border border-slate-800 p-5 rounded-xl shadow">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Top Performing Route Segments</span>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-semibold text-slate-200">Mumbai to Pune Logistics</span>
+              <span class="text-emerald-400 font-bold font-mono">94% Efficiency</span>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+              <div class="h-full bg-emerald-500 rounded-full" style="width: 94%"></div>
+            </div>
+
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-semibold text-slate-200">Delhi to Jaipur Hub</span>
+              <span class="text-cyan-400 font-bold font-mono">88% Efficiency</span>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+              <div class="h-full bg-cyan-500 rounded-full" style="width: 88%"></div>
+            </div>
+
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-semibold text-slate-200">Bengaluru to Chennai Freight</span>
+              <span class="text-amber-500 font-bold font-mono">75% Efficiency</span>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+              <div class="h-full bg-amber-500 rounded-full" style="width: 75%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-[#1E293B] border border-slate-800 p-5 rounded-xl shadow">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Environmental CO2 Savings</span>
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-emerald-950 border border-emerald-800/40 text-emerald-400 flex items-center justify-center text-xl flex-shrink-0">
+              <i data-lucide="leaf"></i>
+            </div>
+            <div class="text-xs">
+              <span class="font-bold text-slate-200 block text-sm">4.5 Tons CO2 Extinguished</span>
+              <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">By substituting traditional diesel routes with Tesla EV class-8 configurations, our carbon blueprint was significantly mitigated.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <script src="/components/layout.js"></script>
+  <script src="/js/analytics.js"></script>
+</body>
+</html>

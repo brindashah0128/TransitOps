@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransitOps AI - Fuel & Charge Logs</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Custom stylesheet link -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#0F172A] text-slate-100 font-sans">
+  
+  <div id="layout-wrapper" class="flex min-h-screen">
+    <main id="main-content" class="flex-1 p-6 space-y-6">
+      
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+            Fuel Core & Charging Logs
+          </h1>
+          <p class="text-xs text-slate-400 mt-1">Audit diesel refills, log electrical gigawatt-hour charging stations, and track consumption metrics.</p>
+        </div>
+
+        <button id="add-fuel-btn" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-md transition duration-150">
+          <i data-lucide="droplet" class="w-4.5 h-4.5"></i>
+          <span>Log Refuel / Charge</span>
+        </button>
+      </div>
+
+      <!-- Fuel Stats Bento -->
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl shadow">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Total Fuel Spent</span>
+          <div class="mt-2 text-2xl font-bold font-mono text-cyan-400">3,450 Gal</div>
+          <span class="text-[10px] block text-slate-500 mt-1">This month</span>
+        </div>
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl shadow">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Electric Chargers</span>
+          <div class="mt-2 text-2xl font-bold font-mono text-emerald-400">1,820 kWh</div>
+          <span class="text-[10px] block text-emerald-500 font-semibold mt-1">Sourced from Tesla Superchargers</span>
+        </div>
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl shadow">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Avg Fleet Efficiency</span>
+          <div class="mt-2 text-2xl font-bold font-mono text-slate-200">12.5 km/L</div>
+          <span class="text-[10px] block text-slate-500 mt-1">Fuel equivalent model</span>
+        </div>
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl shadow">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Total Energy Cost</span>
+          <div class="mt-2 text-2xl font-bold font-mono text-purple-400">₹14,850</div>
+          <span class="text-[10px] block text-slate-500 mt-1">Including charging grids</span>
+        </div>
+      </div>
+
+      <!-- Main Panel: Trends & Spreadsheet logs -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Fuel efficiency trend line -->
+        <div class="lg:col-span-7 bg-[#1E293B] border border-slate-800 p-5 rounded-xl shadow-2xl space-y-4">
+          <span class="text-sm font-bold text-slate-200">Consumption Cost Trend (₹ / Liters equivalent)</span>
+          <div class="h-60">
+            <canvas id="fuel-trends-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Recent Fuel entries spreadsheet -->
+        <div class="lg:col-span-5 bg-[#1E293B] border border-slate-800 rounded-xl overflow-hidden shadow-2xl flex flex-col h-[308px]">
+          <span class="text-sm font-bold text-slate-200 p-4 border-b border-slate-800 bg-slate-900/10">Active Refueling Registry</span>
+          <div class="flex-1 overflow-y-auto">
+            <table class="w-full text-left text-xs divide-y divide-slate-800" id="fuel-table">
+              <thead class="bg-slate-900/60 text-slate-400 uppercase font-semibold">
+                <tr>
+                  <th class="p-3">Vehicle</th>
+                  <th class="p-3">Type</th>
+                  <th class="p-3">Volume</th>
+                  <th class="p-3">Total Cost</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800 text-slate-300" id="fuel-rows">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- NEW FUEL/CHARGE ENTRY MODAL -->
+      <div id="fuel-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-md bg-[#1E293B] border border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-fade-in">
+          <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
+            <span class="text-sm font-bold text-slate-200">Record Core Energizing Node</span>
+            <button id="close-modal-btn" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+              <i data-lucide="x" class="w-4.5 h-4.5"></i>
+            </button>
+          </div>
+          
+          <form id="new-fuel-form" class="p-5 space-y-4">
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Vehicle Asset</label>
+              <select id="f-vehicle" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2.5 outline-none">
+                <option value="Volvo FH16 (Truck-12)">Volvo FH16 (Truck-12) - Diesel</option>
+                <option value="Tesla Semi (Truck-05)">Tesla Semi (Truck-05) - Electric</option>
+                <option value="Ford E-Transit (Van-08)">Ford E-Transit (Van-08) - Electric</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Refueling Station / Power Grid</label>
+              <input type="text" id="f-station" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2.5 outline-none" placeholder="e.g. HP Okhla Super Station or Delhi EV Grid-15">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Volume (Liters or kWh)</label>
+                <input type="number" id="f-volume" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2 outline-none" placeholder="e.g. 150">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Total Cost (₹)</label>
+                <input type="number" id="f-cost" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2 outline-none" placeholder="e.g. 480">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Core Propulsion Type</label>
+              <select id="f-type" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2.5 outline-none">
+                <option value="Diesel">Diesel Combustion</option>
+                <option value="Electric">Electric Battery Charge</option>
+              </select>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg transition-colors shadow-lg">
+              Validate and Archive Energy Log
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="/components/layout.js"></script>
+  <script src="/js/fuel.js"></script>
+</body>
+</html>

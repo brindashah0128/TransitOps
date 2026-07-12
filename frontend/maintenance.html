@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransitOps AI - Maintenance Scheduler</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom stylesheet link -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#0F172A] text-slate-100 font-sans">
+  
+  <div id="layout-wrapper" class="flex min-h-screen">
+    <main id="main-content" class="flex-1 p-6 space-y-6">
+      
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+            Asset Care & Maintenance
+          </h1>
+          <p class="text-xs text-slate-400 mt-1">Plan fleet inspections, track mechanical service expenses, and audit active workshop schedules.</p>
+        </div>
+
+        <button id="add-schedule-btn" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-md shadow-blue-600/15 transition duration-150">
+          <i data-lucide="calendar" class="w-4.5 h-4.5"></i>
+          <span>Schedule Service Interval</span>
+        </button>
+      </div>
+
+      <!-- Quick Maintenance Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl shadow">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Monthly Maintenance Budget</span>
+          <div class="mt-2 text-2xl font-bold font-mono text-cyan-400">₹8,200.00</div>
+          <span class="text-[10px] block text-emerald-400 mt-1">Under allocated budget limits</span>
+        </div>
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl shadow">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Active Workshops</span>
+          <div class="mt-2 text-2xl font-bold font-mono text-amber-400">1 Vehicle</div>
+          <span class="text-[10px] block text-slate-500 mt-1">v-02 (Tesla Semi) Diags</span>
+        </div>
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl shadow">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Pending Safety Alerts</span>
+          <div class="mt-2 text-2xl font-bold font-mono text-rose-400">1 Unit</div>
+          <span class="text-[10px] block text-rose-500 mt-1">Critical: v-01 (Volvo Impeller)</span>
+        </div>
+      </div>
+
+      <!-- Main Layout: Schedulers & Timelines -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Schedules list Table -->
+        <div class="lg:col-span-8 bg-[#1E293B] border border-slate-800 rounded-xl overflow-hidden shadow-2xl flex flex-col">
+          <span class="text-sm font-bold text-slate-200 p-4 border-b border-slate-800">Workshop & Service Logs</span>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs divide-y divide-slate-800" id="maintenance-table">
+              <thead class="bg-slate-900/60 text-slate-400 uppercase font-semibold">
+                <tr>
+                  <th class="p-4">Vehicle Identity</th>
+                  <th class="p-4">Service Category</th>
+                  <th class="p-4">Target Date</th>
+                  <th class="p-4">Estimated Cost</th>
+                  <th class="p-4">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800 text-slate-300" id="maintenance-rows">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right Side: Care Timeline -->
+        <div class="lg:col-span-4 bg-[#1E293B] border border-slate-800 p-5 rounded-xl shadow-2xl flex flex-col">
+          <span class="text-sm font-bold text-slate-200 mb-4 block">Asset Care Timeline</span>
+          <div class="space-y-4 flex-1 overflow-y-auto" id="maintenance-timeline">
+            <!-- Timeline elements dynamically compiled -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SERVICE ORDER FORM MODAL -->
+      <div id="service-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-md bg-[#1E293B] border border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-fade-in">
+          <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
+            <span class="text-sm font-bold text-slate-200">Open Service Order Ticket</span>
+            <button id="close-modal-btn" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+              <i data-lucide="x" class="w-4.5 h-4.5"></i>
+            </button>
+          </div>
+          
+          <form id="new-maintenance-form" class="p-5 space-y-4">
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Vehicle Asset</label>
+              <select id="m-vehicle" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2.5 outline-none">
+                <option value="Volvo FH16 (Truck-12)">Volvo FH16 (Truck-12)</option>
+                <option value="Tesla Semi (Truck-05)">Tesla Semi (Truck-05)</option>
+                <option value="Kenworth T680">Kenworth T680</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Service Category Type</label>
+              <input type="text" id="m-type" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2.5 outline-none" placeholder="e.g. Engine diagnostics, brake pads">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Target Schedule Date</label>
+                <input type="date" id="m-date" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2 outline-none">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Estimated Cost (₹)</label>
+                <input type="number" id="m-cost" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2 outline-none" placeholder="450">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Mechanical Notes</label>
+              <textarea id="m-notes" class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2 outline-none h-20" placeholder="e.g. Regular hydraulic check and flush"></textarea>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg transition-colors shadow-lg">
+              Authorize Workshop Service Order
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="/components/layout.js"></script>
+  <script src="/js/maintenance.js"></script>
+</body>
+</html>

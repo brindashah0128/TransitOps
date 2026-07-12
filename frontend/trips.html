@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransitOps AI - Trip Dispatch</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Leaflet Map CSS/JS CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Custom stylesheet link -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#0F172A] text-slate-100 font-sans">
+  
+  <div id="layout-wrapper" class="flex min-h-screen">
+    <!-- Map-centric layout. Takes full screen width with a Left control panel -->
+    <main id="main-content" class="flex-1 p-0 flex flex-col md:flex-row h-screen overflow-hidden">
+      
+      <!-- Left Panel: Dispatch Wizard Controls -->
+      <div class="w-full md:w-96 bg-[#1E293B] border-r border-slate-800 flex flex-col h-full overflow-y-auto">
+        <!-- Header -->
+        <div class="p-5 border-b border-slate-800 bg-slate-900/30">
+          <h1 class="text-lg font-bold text-white flex items-center gap-2">
+            <i data-lucide="navigation" class="w-5 h-5 text-blue-500"></i>
+            Dijkstra Trip Wizard
+          </h1>
+          <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">Design short-path freight routes, matching vehicle capabilities with elite CDL drivers dynamically.</p>
+        </div>
+
+        <form id="trip-dispatch-form" class="p-5 space-y-4 flex-1">
+          <!-- Route specifications -->
+          <div class="space-y-3">
+            <span class="text-[10px] font-bold uppercase text-slate-400 tracking-wide block">1. Terminal Route Nodes</span>
+            
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-400 mb-1">Departure Station</label>
+              <select id="route-source" required class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2.5 outline-none focus:border-blue-500">
+                <option value="Mumbai Terminal">Mumbai Freight Terminal</option>
+                <option value="Delhi Terminal">Delhi Okhla Terminal</option>
+                <option value="Bengaluru Terminal">Bengaluru Depot</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-400 mb-1">Destination Hub</label>
+              <select id="route-destination" required class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2.5 outline-none focus:border-blue-500">
+                <option value="Pune Hub">Pune Logistics Hub</option>
+                <option value="Jaipur Hub">Jaipur Cargo Hub</option>
+                <option value="Chennai Hub">Chennai Port Hub</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Cargo Weight parameters -->
+          <div class="space-y-2">
+            <span class="text-[10px] font-bold uppercase text-slate-400 tracking-wide block">2. Payload specifications</span>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-1">Cargo Weight</label>
+                <input type="text" id="route-cargo" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2 outline-none" value="18 Tons">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-1">Cargo Class</label>
+                <input type="text" value="Heavy Freight" readonly class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-500 rounded-lg px-3 py-2 outline-none">
+              </div>
+            </div>
+          </div>
+
+          <!-- Matching assets registries -->
+          <div class="space-y-3">
+            <span class="text-[10px] font-bold uppercase text-slate-400 tracking-wide block">3. Fleet & CDL Match</span>
+            
+            <div>
+              <label class="block text-[10px] text-slate-400 mb-1">Available Fleet Vehicle</label>
+              <select id="route-vehicle" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2.5 outline-none focus:border-blue-500">
+                <option value="v-01">Volvo FH16 (Truck-12) - Diesel [92% Health]</option>
+                <option value="v-02">Tesla Semi (Truck-05) - Electric [98% Health]</option>
+                <option value="v-03">Ford E-Transit (Van-08) - Electric [87% Health]</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] text-slate-400 mb-1">Assigned Pilot (CDL Class-A)</label>
+              <select id="route-driver" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2.5 outline-none focus:border-blue-500">
+                <option value="Rajesh Kumar">Rajesh Kumar [Rating: 4.8, Safety: 94%]</option>
+                <option value="Amit Patel">Amit Patel [Rating: 4.9, Safety: 98%]</option>
+                <option value="Sanjay Mehta">Sanjay Mehta [Rating: 4.5, Safety: 88%]</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Projections card -->
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 space-y-2 text-xs">
+            <span class="text-[10px] font-bold uppercase text-cyan-400 tracking-wider">AI Operations Predictions</span>
+            <div class="flex justify-between border-b border-slate-800/50 pb-1">
+              <span class="text-slate-400">Dijkstra Distance:</span>
+              <span class="font-mono font-bold text-slate-200" id="route-distance">150 km</span>
+            </div>
+            <div class="flex justify-between border-b border-slate-800/50 pb-1">
+              <span class="text-slate-400">ETA Corridor:</span>
+              <span class="font-mono font-bold text-slate-200" id="route-eta">3h 30m</span>
+            </div>
+            <div class="flex justify-between border-b border-slate-800/50 pb-1">
+              <span class="text-slate-400">Estimated Fuel core:</span>
+              <span class="font-mono font-bold text-slate-200" id="route-fuel-est">20 Liters</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Estimated transit cost:</span>
+              <span class="font-mono font-bold text-emerald-400" id="route-cost-est">₹2,200</span>
+            </div>
+          </div>
+
+          <!-- Dispatch submission -->
+          <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-lg text-xs font-bold shadow-md shadow-blue-500/15 transform hover:-translate-y-0.5 transition duration-150 flex items-center justify-center gap-1.5">
+            <i data-lucide="navigation-2" class="w-4 h-4"></i>
+            <span>Authorize Cargo Dispatch</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Right Panel: Full size Route mapping container -->
+      <div class="flex-1 relative h-full">
+        <div id="dispatch-map" class="w-full h-full"></div>
+        
+        <!-- Live Trip Overlay Statistics -->
+        <div class="absolute top-4 right-4 bg-[#1E293B]/90 border border-slate-700 p-4 rounded-xl shadow-2xl z-[1000] backdrop-blur-md max-w-xs space-y-3 hidden" id="trip-live-overlay">
+          <div class="flex items-center gap-2 border-b border-slate-700 pb-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span class="text-xs font-bold text-white uppercase tracking-wide">ACTIVE MISSION FLIGHT</span>
+          </div>
+          <div class="space-y-1.5 text-xs text-slate-300">
+            <div><strong class="text-slate-500 block text-[9px] uppercase">Pilot CDL</strong> <span id="overlay-driver">Rajesh Kumar</span></div>
+            <div><strong class="text-slate-500 block text-[9px] uppercase">Asset Unit</strong> <span id="overlay-vehicle">Volvo FH16</span></div>
+            <div><strong class="text-slate-500 block text-[9px] uppercase">ETA Station</strong> <span id="overlay-eta">14:30 PM</span></div>
+          </div>
+          <div class="flex gap-2 pt-2 border-t border-slate-700">
+            <button class="flex-1 py-1 px-2.5 bg-rose-950/50 hover:bg-rose-900/50 text-rose-400 border border-rose-800/30 rounded text-[10px] font-bold" id="abort-trip-btn">Abort Trip</button>
+            <button class="flex-1 py-1 px-2.5 bg-emerald-950/50 hover:bg-emerald-900/50 text-emerald-400 border border-emerald-800/30 rounded text-[10px] font-bold" id="complete-trip-btn">Complete</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="/components/layout.js"></script>
+  <script src="/js/trips.js"></script>
+</body>
+</html>

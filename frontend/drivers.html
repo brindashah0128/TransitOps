@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransitOps AI - Driver Management</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Leaflet Map CSS/JS CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Custom stylesheet link -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#0F172A] text-slate-100 font-sans">
+  
+  <div id="layout-wrapper" class="flex min-h-screen">
+    <main id="main-content" class="flex-1 p-6 space-y-6 relative overflow-hidden">
+      
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+            Driver Registry & Performance
+          </h1>
+          <p class="text-xs text-slate-400 mt-1">Audit CDL validations, analyze telematics driver safety scores, and view live active pilots.</p>
+        </div>
+
+        <button id="add-driver-btn" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-md shadow-blue-600/15 transition duration-150">
+          <i data-lucide="user-plus" class="w-4.5 h-4.5"></i>
+          <span>Enlist Operator CDL</span>
+        </button>
+      </div>
+
+      <!-- Quick filters and layout toggle -->
+      <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row gap-4 justify-between items-center shadow-lg">
+        <div class="relative w-full md:w-96">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </span>
+          <input type="text" id="driver-search" class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 rounded-lg pl-10 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 outline-none" placeholder="Search pilots by name, status or safety flag...">
+        </div>
+
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <select id="driver-filter-safety" class="w-full md:w-44 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none">
+            <option value="ALL">All Safety Scores</option>
+            <option value="EXCELLENT">Elite (>90% Score)</option>
+            <option value="WARNING">Risky (<80% Score)</option>
+          </select>
+          <select id="driver-filter-status" class="w-full md:w-40 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none">
+            <option value="ALL">All Statuses</option>
+            <option value="Available">Available</option>
+            <option value="On Trip">On Trip</option>
+            <option value="Emergency">Emergency</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Drivers Grid Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="drivers-grid">
+        <!-- Dynamically populated via JS -->
+      </div>
+
+      <!-- DRIVER DETAIL DRAWER -->
+      <div id="driver-detail-drawer" class="fixed inset-y-0 right-0 w-full sm:w-[480px] bg-[#1E293B] border-l border-slate-700 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out hidden flex-col">
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="user-check" class="w-5 h-5 text-blue-400"></i>
+            <span class="text-sm font-bold text-slate-200">Pilot Telematics & Performance</span>
+          </div>
+          <button id="close-driver-drawer-btn" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-5 space-y-6">
+          <div class="flex items-center gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+            <div id="drawer-driver-avatar" class="w-16 h-16 rounded-full bg-blue-600 border border-blue-500/30 flex items-center justify-center text-lg font-bold text-white shadow-sm flex-shrink-0 select-none">DK</div>
+            <div>
+              <h2 class="text-base font-bold text-slate-100" id="drawer-driver-name">Amit Patel</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Heavy Freight Certified Pilot</p>
+              <div class="flex items-center gap-1.5 mt-2">
+                <span class="px-2 py-0.5 text-[9px] font-bold rounded-full border bg-emerald-950 border-emerald-800/40 text-emerald-400 uppercase tracking-wider" id="drawer-driver-status">Available</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-slate-900/40 p-3.5 rounded-lg border border-slate-800/80">
+              <span class="text-[9px] uppercase font-bold text-slate-500 tracking-wider">CDL validation</span>
+              <span class="text-xs font-semibold text-emerald-400 block mt-1" id="drawer-driver-license">Active Class-A</span>
+            </div>
+            <div class="bg-slate-900/40 p-3.5 rounded-lg border border-slate-800/80">
+              <span class="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Experience</span>
+              <span class="text-xs font-semibold text-slate-200 block mt-1" id="drawer-driver-exp">12 Years</span>
+            </div>
+          </div>
+
+          <!-- Chart target sparkline -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wide">Historical Safety Index</span>
+              <span class="text-[10px] font-semibold text-cyan-400">CURRENT SCORE: <strong id="drawer-driver-safety">98%</strong></span>
+            </div>
+            <div class="h-32 bg-slate-900/40 p-2 rounded-xl border border-slate-800/80">
+              <canvas id="driver-sparkline"></canvas>
+            </div>
+          </div>
+
+          <!-- Live GIS coordinate mapping -->
+          <div class="space-y-2">
+            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wide block">Current Active Coordinates</span>
+            <div class="h-44 rounded-xl overflow-hidden border border-slate-800 relative bg-slate-900">
+              <div id="driver-mini-map" class="w-full h-full"></div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wide block">Recent safety event log</span>
+            <div class="p-3 bg-slate-900/40 rounded-lg border border-slate-800/80 text-xs">
+              <div class="flex items-center justify-between pb-1.5 border-b border-slate-800 mb-1.5">
+                <span class="font-bold text-slate-200" id="drawer-driver-incident-title">Latest Incident</span>
+                <span class="text-slate-500 text-[10px]">Logged via Telematics</span>
+              </div>
+              <p class="text-slate-400 text-[11px] leading-relaxed" id="drawer-driver-incident">No severe steering anomalies or braking warnings detected this week.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="/components/layout.js"></script>
+  <script src="/js/drivers.js"></script>
+</body>
+</html>

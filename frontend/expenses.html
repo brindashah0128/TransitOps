@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransitOps AI - Ledger & Expenses</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Custom stylesheet link -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#0F172A] text-slate-100 font-sans">
+  
+  <div id="layout-wrapper" class="flex min-h-screen">
+    <main id="main-content" class="flex-1 p-6 space-y-6">
+      
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+            Operations Ledger & Expenses
+          </h1>
+          <p class="text-xs text-slate-400 mt-1">Audit operational overhead costs, log tolls, pilot salaries, and generate financial reports.</p>
+        </div>
+
+        <button id="add-expense-btn" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-md transition duration-150">
+          <i data-lucide="indian-rupee" class="w-4.5 h-4.5"></i>
+          <span>Log Ledger Transaction</span>
+        </button>
+      </div>
+
+      <!-- Financial overview grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl shadow">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Total Monthly Expenses</span>
+          <div class="mt-2 text-2xl font-bold font-mono text-rose-400">₹84,650.00</div>
+          <span class="text-[10px] block text-slate-500 mt-1">Refueling, salaries & tolls included</span>
+        </div>
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl shadow">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Average Cost / km</span>
+          <div class="mt-2 text-2xl font-bold font-mono text-cyan-400">₹12.50</div>
+          <span class="text-[10px] block text-emerald-500 font-semibold mt-1">Optimized via shortest path model</span>
+        </div>
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl shadow">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Profit Margin</span>
+          <div class="mt-2 text-2xl font-bold font-mono text-emerald-400">32.5%</div>
+          <span class="text-[10px] block text-slate-500 mt-1">Against total gross revenues</span>
+        </div>
+      </div>
+
+      <!-- Middle Layout: Categories and Ledger spreadsheets -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Category allocation pie/doughnut -->
+        <div class="lg:col-span-5 bg-[#1E293B] border border-slate-800 p-5 rounded-xl shadow-2xl flex flex-col justify-between h-[360px]">
+          <span class="text-sm font-bold text-slate-200 block border-b border-slate-800 pb-2">Expense Category Allocation</span>
+          <div class="flex-1 relative flex items-center justify-center p-4">
+            <canvas id="expenses-doughnut-chart" class="max-h-52"></canvas>
+          </div>
+        </div>
+
+        <!-- Spreadsheet ledger table -->
+        <div class="lg:col-span-7 bg-[#1E293B] border border-slate-800 rounded-xl overflow-hidden shadow-2xl flex flex-col h-[360px]">
+          <span class="text-sm font-bold text-slate-200 p-4 border-b border-slate-800 bg-slate-900/10">Operations Ledger Sheet</span>
+          <div class="flex-1 overflow-y-auto">
+            <table class="w-full text-left text-xs divide-y divide-slate-800" id="ledger-table">
+              <thead class="bg-slate-900/60 text-slate-400 uppercase font-semibold">
+                <tr>
+                  <th class="p-3">Reference</th>
+                  <th class="p-3">Category</th>
+                  <th class="p-3">Logged Date</th>
+                  <th class="p-3">Total Amount</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800 text-slate-300" id="ledger-rows">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- NEW TRANSACTION FORM MODAL -->
+      <div id="expense-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-md bg-[#1E293B] border border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-fade-in">
+          <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
+            <span class="text-sm font-bold text-slate-200">Log Ledger Transaction Entry</span>
+            <button id="close-modal-btn" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+              <i data-lucide="x" class="w-4.5 h-4.5"></i>
+            </button>
+          </div>
+          
+          <form id="new-expense-form" class="p-5 space-y-4">
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Ledger Reference Description</label>
+              <input type="text" id="e-desc" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2.5 outline-none" placeholder="e.g. Fuel purchase - Mumbai Terminals">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Category Category</label>
+                <select id="e-category" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2.5 outline-none">
+                  <option value="Fuel">Fuel / Battery Power</option>
+                  <option value="Salaries">Pilot Salaries</option>
+                  <option value="Maintenance">Maintenance & Parts</option>
+                  <option value="Tolls">Tolls / Logistics Licensing</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Cost Amount (₹)</label>
+                <input type="number" id="e-cost" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2.5 outline-none" placeholder="e.g. 1500">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Transaction Date</label>
+              <input type="date" id="e-date" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2 outline-none">
+            </div>
+
+            <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg transition-colors shadow-lg">
+              Authorize Ledger Transaction
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="/components/layout.js"></script>
+  <script src="/js/expenses.js"></script>
+</body>
+</html>

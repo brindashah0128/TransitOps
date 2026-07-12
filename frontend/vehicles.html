@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransitOps AI - Vehicle Registry</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Leaflet Map CSS/JS CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Custom stylesheet link -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#0F172A] text-slate-100 font-sans">
+  
+  <div id="layout-wrapper" class="flex min-h-screen">
+    <main id="main-content" class="flex-1 p-6 space-y-6 relative overflow-hidden">
+      
+      <!-- Top header layout -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+            Vehicle Registry Terminal
+          </h1>
+          <p class="text-xs text-slate-400 mt-1">Configure asset parameters, inspect registration statuses, and review real-time mechanical health scores.</p>
+        </div>
+
+        <button id="add-vehicle-btn" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-md shadow-blue-600/15 transition duration-150">
+          <i data-lucide="plus-circle" class="w-4.5 h-4.5"></i>
+          <span>Commission Vehicle</span>
+        </button>
+      </div>
+
+      <!-- Live Search and Filter Rail -->
+      <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row gap-4 justify-between items-center shadow-lg">
+        <div class="relative w-full md:w-96">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </span>
+          <input type="text" id="vehicle-search" class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 rounded-lg pl-10 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 outline-none" placeholder="Search registry by vehicle model, plates or driver...">
+        </div>
+
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <select id="vehicle-filter-type" class="w-full md:w-40 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none">
+            <option value="ALL">All Propulsion types</option>
+            <option value="Diesel">Diesel</option>
+            <option value="Electric">Electric</option>
+          </select>
+          <select id="vehicle-filter-status" class="w-full md:w-40 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none">
+            <option value="ALL">All Statuses</option>
+            <option value="Available">Available</option>
+            <option value="On Trip">On Trip</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Emergency">Emergency</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Grid or Table layout -->
+      <div class="bg-[#1E293B] border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs divide-y divide-slate-800" id="vehicles-table">
+            <thead class="bg-slate-900/60 text-slate-400 uppercase tracking-wider font-semibold">
+              <tr>
+                <th class="p-4">Vehicle Model</th>
+                <th class="p-4">Reg Plate</th>
+                <th class="p-4">Fuel Core</th>
+                <th class="p-4">Current Pilot</th>
+                <th class="p-4">Active Trip</th>
+                <th class="p-4">Mechanical Health</th>
+                <th class="p-4">Status</th>
+                <th class="p-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 text-slate-300" id="vehicles-table-rows">
+              <!-- Dynamically populated via JS -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Pagination controls -->
+        <div class="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500 font-semibold bg-slate-900/10">
+          <span>Displaying <strong class="text-slate-400" id="visible-count">6</strong> vehicles</span>
+          <div class="flex gap-2">
+            <button class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded transition duration-150">Prev</button>
+            <button class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded transition duration-150">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE DRAWER FOR DETAILED VIEW -->
+      <div id="vehicle-detail-drawer" class="fixed inset-y-0 right-0 w-full sm:w-[480px] bg-[#1E293B] border-l border-slate-700 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out hidden flex-col">
+        <!-- Drawer Header -->
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="info" class="w-5 h-5 text-blue-400"></i>
+            <span class="text-sm font-bold text-slate-200">Asset Specifications Panel</span>
+          </div>
+          <button id="close-drawer-btn" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Drawer Body Content -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-6">
+          <div class="rounded-xl overflow-hidden h-40 bg-slate-900 relative">
+            <img id="drawer-vehicle-image" src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&h=200&q=80" alt="Truck" class="w-full h-full object-cover">
+            <div class="absolute bottom-3 left-3 bg-slate-950/80 px-2 py-1 rounded text-[10px] font-mono border border-slate-800 text-cyan-400" id="drawer-vehicle-id">v-01</div>
+          </div>
+
+          <div>
+            <h2 class="text-lg font-bold text-slate-100" id="drawer-vehicle-name">Volvo FH16 (Truck-12)</h2>
+            <p class="text-xs text-slate-500 mt-1" id="drawer-vehicle-type">Heavy Cargo Freightliner</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-800/80">
+              <span class="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Registration status</span>
+              <span class="text-xs font-semibold text-emerald-400 block mt-1" id="drawer-vehicle-regstatus">Active</span>
+            </div>
+            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-800/80">
+              <span class="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Insurance status</span>
+              <span class="text-xs font-semibold text-emerald-400 block mt-1" id="drawer-vehicle-insurance">Active</span>
+            </div>
+          </div>
+
+          <!-- Mini Leaflet Map Tracking -->
+          <div class="space-y-2">
+            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wide block">GCP Satellite Coordinate</span>
+            <div class="h-40 rounded-xl overflow-hidden border border-slate-800 relative bg-slate-900">
+              <div id="drawer-mini-map" class="w-full h-full"></div>
+            </div>
+          </div>
+
+          <!-- Document List -->
+          <div class="space-y-3">
+            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wide block">Encrypted Documents Storage</span>
+            <div class="space-y-2" id="drawer-vehicle-docs">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW VEHICLE ENTRY MODAL -->
+      <div id="vehicle-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-lg bg-[#1E293B] border border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-fade-in">
+          <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
+            <span class="text-sm font-bold text-slate-200">Commission Fleet Asset</span>
+            <button id="close-modal-btn" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+              <i data-lucide="x" class="w-4.5 h-4.5"></i>
+            </button>
+          </div>
+          
+          <form id="new-vehicle-form" class="p-5 space-y-4">
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Vehicle Model Name</label>
+              <input type="text" id="modal-model-name" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2.5 outline-none" placeholder="e.g. Volvo FH16 Heavy Freight">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Plate Registration</label>
+                <input type="text" id="modal-plate" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2.5 outline-none" placeholder="e.g. TX-9911-E">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Maximum Cargo weight</label>
+                <input type="text" id="modal-capacity" required class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 text-xs text-slate-200 rounded-lg px-3 py-2.5 outline-none" placeholder="e.g. 24 Tons">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Propulsion Core</label>
+                <select id="modal-propulsion" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2.5 outline-none">
+                  <option value="Diesel">Diesel</option>
+                  <option value="Electric">Electric</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wide">Asset Category</label>
+                <select id="modal-type" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-3 py-2.5 outline-none">
+                  <option value="Heavy Truck">Heavy Cargo Truck</option>
+                  <option value="EV Heavy Truck">EV Class-8 Semi</option>
+                  <option value="EV Cargo Van">Electric Delivery Van</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg transition-colors shadow-lg shadow-blue-500/15">
+              Authorize Asset Commissioning
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="/components/layout.js"></script>
+  <script src="/js/vehicles.js"></script>
+</body>
+</html>

@@ -1,0 +1,420 @@
+/* Global transit dashboard custom styles */
+
+/* Custom scrollbars for professional dashboard view */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0F172A;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes pulseBorder {
+  0%, 100% { border-color: rgba(37, 99, 235, 0.4); box-shadow: 0 0 0 0px rgba(37, 99, 235, 0.2); }
+  50% { border-color: rgba(6, 182, 212, 0.8); box-shadow: 0 0 8px 2px rgba(6, 182, 212, 0.3); }
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.glass-card {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.premium-glow {
+  box-shadow: 0 0 20px -5px rgba(6, 182, 212, 0.15);
+}
+
+.pulse-glow-cyan {
+  animation: pulseBorder 2s infinite ease-in-out;
+}
+
+/* Map sizing and standardizations */
+.map-container {
+  height: 100%;
+  min-height: 400px;
+  background-color: #1e293b;
+  position: relative;
+}
+
+/* Leaflet customized dark theme filter */
+.leaflet-container {
+  background: #0f172a !important;
+}
+
+.leaflet-tile-container img {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px !important;
+}
+
+.leaflet-popup-tip {
+  background-color: #1e293b !important;
+}
+
+/* Custom typing dot indicators */
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #94a3b8;
+  border-radius: 50%;
+  display: inline-block;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1.0); }
+}
+
+/* ==========================================================
+   HIGH DENSITY DESIGN THEME & LAYOUT PATTERNS OVERRIDES
+   ========================================================== */
+
+/* Universal Font & Text Spacing */
+body, html {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  background-color: #0F172A !important;
+  color: #F1F5F9 !important;
+  letter-spacing: -0.011em;
+}
+
+/* Card Density & Uniform Card Styling */
+.rounded-xl,
+[class*="bg-[#1E293B]"],
+[class*="bg-slate-900"],
+[class*="bg-[#1E293B]/70"] {
+  background-color: #1E293B !important;
+  border: 1px solid rgba(148, 163, 184, 0.12) !important;
+  border-radius: 6px !important; /* Tight, professional radius */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Tighten standard page padding for "High Density" vibe */
+main#main-content {
+  padding: 1rem !important; /* Reduced from 1.5rem / p-6 */
+  margin-top: 0 !important;
+}
+
+/* Compact Container Spacing & Gaps */
+.space-y-6 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: 1rem !important; /* Reduced from space-y-6 */
+}
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: 0.75rem !important;
+}
+.gap-6 {
+  gap: 1rem !important; /* Reduced grid/flex gaps for compaction */
+}
+.gap-4 {
+  gap: 0.75rem !important;
+}
+
+/* Grid & Layout Adjustments */
+.grid-cols-2 {
+  gap: 0.75rem !important;
+}
+
+/* High Density Typography Sizing */
+h1 {
+  font-size: 1.25rem !important; /* Tightened title sizes */
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
+}
+h2 {
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+}
+h3 {
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+}
+p, span, div, label, td, th {
+  letter-spacing: -0.01em;
+}
+
+/* Tightened Card Padding */
+.p-6, .p-5 {
+  padding: 1rem !important; /* Compact inner-card padding */
+}
+.p-4 {
+  padding: 0.75rem !important;
+}
+.p-3 {
+  padding: 0.5rem !important;
+}
+.px-6 {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* Form Fields & Buttons Compactness */
+input, select, textarea, button {
+  font-size: 0.75rem !important; /* Compact high-density inputs */
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+  border-radius: 4px !important;
+  border-color: rgba(148, 163, 184, 0.15) !important;
+}
+.role-btn {
+  padding: 0.35rem 0.6rem !important;
+}
+
+/* Premium Enterprise Table High Density Restyling */
+table {
+  font-size: 0.75rem !important; /* Reduced text sizes for dense display */
+}
+th {
+  padding: 0.4rem 0.6rem !important;
+  font-size: 0.68rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  background-color: #151D2E !important;
+  color: #94A3B8 !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15) !important;
+}
+td {
+  padding: 0.4rem 0.6rem !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08) !important;
+}
+tr:hover td {
+  background-color: rgba(148, 163, 184, 0.03) !important;
+}
+
+/* Map & List Containers Compactness */
+.h-\[520px\], .h-\[500px\], .h-\[560px\] {
+  height: 440px !important; /* Compact panels for better grid viewing */
+}
+#dashboard-leaflet-map {
+  min-height: 380px !important;
+}
+
+/* High Density Badges & Status Indicators */
+.rounded-full {
+  border-radius: 4px !important; /* Subtle boxiness instead of huge pills */
+  padding-left: 0.4rem !important;
+  padding-right: 0.4rem !important;
+  font-size: 0.65rem !important;
+}
+
+/* Co-Pilot Message UI High Density Overrides */
+.chat-message-bubble {
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.75rem !important;
+  line-height: 1.4 !important;
+  border-radius: 6px !important;
+}
+
+/* Accent Buttons Hover States to Blue Gradient */
+button.bg-blue-600, 
+button.bg-gradient-to-r,
+.bg-gradient-to-r {
+  background-image: linear-gradient(to right, #2563EB, #06B6D4) !important;
+  border-color: transparent !important;
+}
+button.bg-blue-600:hover, 
+button.bg-gradient-to-r:hover {
+  filter: brightness(1.1) !important;
+}
+
+/* Dropdown and Popover menus theme-alignment */
+[id*="dropdown"], [id*="panel"] {
+  background-color: #1E293B !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
+  border-radius: 6px !important;
+}
+
+/* ==========================================================
+   LIGHT MODE THEME OVERRIDES
+   ========================================================== */
+.light-theme, .light-theme body, .light-theme html {
+  background-color: #F8FAFC !important;
+  color: #1E293B !important;
+}
+
+.light-theme ::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+.light-theme ::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+}
+
+.light-theme .rounded-xl,
+.light-theme [class*="bg-[#1E293B]"],
+.light-theme [class*="bg-[#151D2E]"],
+.light-theme [class*="bg-slate-900"],
+.light-theme [class*="bg-[#1E293B]/70"] {
+  background-color: #FFFFFF !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+  color: #1E293B !important;
+}
+
+/* Sidebar Light Override */
+.light-theme aside {
+  background-color: #F1F5F9 !important;
+  border-right: 1px solid rgba(148, 163, 184, 0.25) !important;
+}
+.light-theme aside * {
+  color: #334155 !important;
+}
+.light-theme aside a:hover, .light-theme aside .bg-[#151D2E] a:hover {
+  background-color: #E2E8F0 !important;
+}
+.light-theme aside a.active {
+  background-color: #E2E8F0 !important;
+  border-left-color: #2563EB !important;
+}
+.light-theme aside #admin-name {
+  color: #0F172A !important;
+}
+.light-theme aside #admin-avatar {
+  background-color: #2563EB !important;
+  color: #FFFFFF !important;
+}
+.light-theme aside .border-t {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  background-color: #E2E8F0 !important;
+}
+
+/* Header Light Override */
+.light-theme header {
+  background-color: #FFFFFF !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+.light-theme header * {
+  color: #334155 !important;
+}
+.light-theme header #utc-clock {
+  color: #2563EB !important;
+}
+.light-theme header #breadcrumb-page-name {
+  color: #0F172A !important;
+}
+
+/* Card typography light mode colors */
+.light-theme h1, .light-theme h2, .light-theme h3 {
+  color: #0F172A !important;
+}
+.light-theme p, .light-theme span, .light-theme label {
+  color: #475569 !important;
+}
+.light-theme input, .light-theme select, .light-theme textarea {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+}
+
+/* Tables in light mode */
+.light-theme th {
+  background-color: #F1F5F9 !important;
+  color: #475569 !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.25) !important;
+}
+.light-theme td {
+  color: #334155 !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15) !important;
+}
+.light-theme tr:hover td {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Badges in light mode */
+.light-theme .bg-emerald-950 {
+  background-color: #DCFCE7 !important;
+  color: #166534 !important;
+  border-color: #BBF7D0 !important;
+}
+.light-theme .bg-rose-950 {
+  background-color: #FEE2E2 !important;
+  color: #991B1B !important;
+  border-color: #FECACA !important;
+}
+.light-theme .bg-blue-950 {
+  background-color: #DBEAFE !important;
+  color: #1E40AF !important;
+  border-color: #BFDBFE !important;
+}
+.light-theme .bg-amber-950 {
+  background-color: #FEF3C7 !important;
+  color: #92400E !important;
+  border-color: #FDE68A !important;
+}
+
+/* Map adjustment for light mode */
+.light-theme .leaflet-container {
+  background: #F8FAFC !important;
+}
+.light-theme .leaflet-tile-container img {
+  filter: none !important; /* Standard standard leaflet map in light theme */
+}
+.light-theme .leaflet-popup-content-wrapper {
+  background-color: #FFFFFF !important;
+  color: #1E293B !important;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.light-theme .leaflet-popup-tip {
+  background-color: #FFFFFF !important;
+}
+
+/* Chat bubbles / drawers */
+.light-theme .chat-message-bubble {
+  background-color: #E2E8F0 !important;
+  color: #1E293B !important;
+}
+.light-theme .chat-message-bubble.bg-blue-600 {
+  background-image: linear-gradient(to right, #2563EB, #06B6D4) !important;
+  color: #FFFFFF !important;
+}
+.light-theme #driver-detail-drawer {
+  background-color: #FFFFFF !important;
+  border-left: 1px solid rgba(148, 163, 184, 0.25) !important;
+}
+.light-theme #driver-detail-drawer * {
+  color: #334155 !important;
+}

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransitOps AI - Operations Hub</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Leaflet Map CSS/JS CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Custom stylesheet link -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#0F172A] text-slate-100 font-sans">
+  
+  <div id="layout-wrapper" class="flex min-h-screen">
+    <!-- Main content container dynamically compiled by layout.js -->
+    <main id="main-content" class="flex-1 p-6 space-y-6">
+      
+      <!-- Top Overview Row -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+            Operations Control Room
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 font-semibold border border-emerald-800/40 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> SYSTEM NOMINAL
+            </span>
+          </h1>
+          <p class="text-xs text-slate-400 mt-1">Real-time telematics integration, shortest path modeling, and predictive intelligence overview.</p>
+        </div>
+
+        <!-- Weather and Status indicators -->
+        <div class="flex items-center gap-3 bg-[#1E293B]/60 p-2.5 rounded-xl border border-slate-800 text-xs">
+          <div class="flex items-center gap-2 border-r border-slate-800 pr-3">
+            <i data-lucide="cloud-sun" class="w-4.5 h-4.5 text-amber-400"></i>
+            <div>
+              <span class="font-semibold block text-slate-200">28°C</span>
+              <span class="text-[9px] text-slate-500 uppercase font-bold">Mumbai Terminal</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <i data-lucide="satellite" class="w-4.5 h-4.5 text-blue-400"></i>
+            <div>
+              <span class="font-semibold block text-slate-200" id="active-gps-satellites">18 Sats</span>
+              <span class="text-[9px] text-slate-500 uppercase font-bold">GPS Accuracy 99%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick stats grids -->
+      <div class="grid grid-cols-2 lg:grid-cols-6 gap-4">
+        
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl flex flex-col justify-between hover:border-blue-500/30 transition duration-150 shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Fleet Score</span>
+            <div class="w-6 h-6 rounded bg-emerald-950 text-emerald-400 flex items-center justify-center text-xs font-semibold">AI</div>
+          </div>
+          <div class="mt-4">
+            <span class="text-2xl font-bold font-mono text-emerald-400">88%</span>
+            <span class="text-[10px] block text-slate-500 mt-1">Operational Health</span>
+          </div>
+        </div>
+
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl flex flex-col justify-between hover:border-blue-500/30 transition duration-150 shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Active Trips</span>
+            <i data-lucide="navigation" class="w-4 h-4 text-cyan-400"></i>
+          </div>
+          <div class="mt-4">
+            <span class="text-2xl font-bold font-mono text-cyan-400" id="total-trips-count">3</span>
+            <span class="text-[10px] block text-slate-500 mt-1">Routes In-progress</span>
+          </div>
+        </div>
+
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl flex flex-col justify-between hover:border-blue-500/30 transition duration-150 shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Revenue</span>
+            <i data-lucide="arrow-up-right" class="w-4 h-4 text-emerald-400"></i>
+          </div>
+          <div class="mt-4">
+            <span class="text-2xl font-bold font-mono text-emerald-400">₹12.5L</span>
+            <span class="text-[10px] block text-emerald-500 mt-1 font-semibold">+8.4% this month</span>
+          </div>
+        </div>
+
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl flex flex-col justify-between hover:border-blue-500/30 transition duration-150 shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Total Expenses</span>
+            <i data-lucide="arrow-down-right" class="w-4 h-4 text-rose-400"></i>
+          </div>
+          <div class="mt-4">
+            <span class="text-2xl font-bold font-mono text-rose-400">₹8.4L</span>
+            <span class="text-[10px] block text-slate-500 mt-1">Including salaries & fuel</span>
+          </div>
+        </div>
+
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl flex flex-col justify-between hover:border-blue-500/30 transition duration-150 shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Fuel Consumed</span>
+            <i data-lucide="droplet" class="w-4 h-4 text-blue-400"></i>
+          </div>
+          <div class="mt-4">
+            <span class="text-2xl font-bold font-mono text-blue-400">13,050 L</span>
+            <span class="text-[10px] block text-slate-500 mt-1">Biodiesel / Diesel mix</span>
+          </div>
+        </div>
+
+        <div class="bg-[#1E293B] border border-slate-800 p-4 rounded-xl flex flex-col justify-between hover:border-blue-500/30 transition duration-150 shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Unit Cost</span>
+            <i data-lucide="indian-rupee" class="w-4 h-4 text-purple-400"></i>
+          </div>
+          <div class="mt-4">
+            <span class="text-2xl font-bold font-mono text-purple-400">₹12.50</span>
+            <span class="text-[10px] block text-slate-500 mt-1">Average per km</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Middle Panel: Interactive Live Tracking Map & AI recommendations -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Live Tracking Map card -->
+        <div class="lg:col-span-8 bg-[#1E293B] border border-slate-800 rounded-xl overflow-hidden shadow-2xl flex flex-col h-[520px]">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="map-pin" class="w-4 h-4 text-blue-400"></i>
+              <span class="text-sm font-bold text-slate-200">Active Fleet Telematics & Live Map</span>
+            </div>
+            <!-- Traffic layer status checkbox -->
+            <label class="flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span class="font-medium">OSM Live Server</span>
+            </label>
+          </div>
+          
+          <!-- Map container element -->
+          <div class="flex-1 relative">
+            <div id="dashboard-leaflet-map" class="w-full h-full min-h-[400px]"></div>
+          </div>
+        </div>
+
+        <!-- AI Recommendation Cards & Insights Panel -->
+        <div class="lg:col-span-4 bg-[#1E293B] border border-slate-800 rounded-xl p-5 shadow-2xl flex flex-col h-[520px] overflow-hidden">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4 text-cyan-400 animate-pulse"></i>
+              <span class="text-sm font-bold text-slate-200">AI Co-Pilot Recommendations</span>
+            </div>
+          </div>
+
+          <!-- Insight Cards Scroller -->
+          <div class="flex-1 overflow-y-auto space-y-3 pr-1" id="ai-insights-list">
+            
+            <div class="p-3.5 rounded-lg bg-blue-950/25 border border-blue-800/30">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">Predictive Maintenance</span>
+                <span class="text-[9px] text-slate-500 font-semibold font-mono">CONFIDENCE: 94%</span>
+              </div>
+              <h3 class="text-xs font-semibold text-slate-200 mt-1.5">Volvo FH16 Pump Replacement</h3>
+              <p class="text-[11px] text-slate-400 mt-1">Exhaust vibration signature of **v-01** suggests coolant pump issues in the next **48 hours**. Service is scheduled.</p>
+            </div>
+
+            <div class="p-3.5 rounded-lg bg-emerald-950/20 border border-emerald-800/35">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wide">Dispatch Optimization</span>
+                <span class="text-[9px] text-slate-500 font-semibold font-mono">SAVINGS: ₹2,200/trip</span>
+              </div>
+              <h3 class="text-xs font-semibold text-slate-200 mt-1.5 font-medium">Re-route Semi-05 to High-Toll Lanes</h3>
+              <p class="text-[11px] text-slate-400 mt-1">Tesla Semi regenerative braking profiles indicate bypass on toll structures produces net savings compared to highway grade shifts.</p>
+            </div>
+
+            <div class="p-3.5 rounded-lg bg-amber-950/20 border border-amber-800/35">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wide">Weather Routing</span>
+                <span class="text-[9px] text-slate-500 font-semibold font-mono">ETA DELAY: +45m</span>
+              </div>
+              <h3 class="text-xs font-semibold text-slate-200 mt-1.5">Extreme Heat Routing: Jaipur</h3>
+              <p class="text-[11px] text-slate-400 mt-1">High midday ambient temperatures may accelerate cell cooling degradation on EV Semis. Recommending departure shift.</p>
+            </div>
+
+          </div>
+
+          <!-- Bottom micro-actions linking to AI assistant page -->
+          <div class="pt-4 border-t border-slate-800 mt-4 flex items-center justify-between">
+            <span class="text-[10px] text-slate-500 font-mono">PROMPT ASSISTANT FOR FORECASTS</span>
+            <a href="assistant.html" class="text-xs text-cyan-400 font-semibold hover:underline flex items-center gap-1">
+              Open Co-Pilot Terminal <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Panel: Operational charts, recent dispatch logs, quick metrics -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Fleet metrics charts panel -->
+        <div class="lg:col-span-8 bg-[#1E293B] border border-slate-800 p-5 rounded-xl shadow-2xl space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-slate-200">System Analytics Overview</span>
+            <div class="flex items-center gap-2">
+              <select id="analytics-filter" class="bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded px-2 py-1 outline-none">
+                <option value="utilization">Fleet Utilization</option>
+                <option value="expenses">Expenses vs Revenues</option>
+              </select>
+            </div>
+          </div>
+          <!-- Chart target canvas -->
+          <div class="h-64">
+            <canvas id="dashboard-analytics-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Recent activity timelines -->
+        <div class="lg:col-span-4 bg-[#1E293B] border border-slate-800 p-5 rounded-xl shadow-2xl flex flex-col h-[328px] overflow-hidden">
+          <span class="text-sm font-bold text-slate-200 mb-4 block">Active Operations Log</span>
+          
+          <div class="flex-1 overflow-y-auto space-y-4 pr-1" id="recent-activity-timeline">
+            
+            <div class="flex gap-3 relative">
+              <span class="absolute top-5 left-2 bottom-0 w-0.5 bg-slate-800"></span>
+              <div class="w-4 h-4 rounded-full bg-blue-600 border-2 border-slate-900 flex items-center justify-center flex-shrink-0 z-10">
+                <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+              </div>
+              <div class="text-xs">
+                <span class="font-semibold text-slate-200 block">Truck-12 Dispatched</span>
+                <p class="text-[11px] text-slate-400 mt-0.5">Route Mumbai to Pune initiated with Driver Rajesh Kumar.</p>
+                <span class="text-[10px] text-slate-500 block mt-1">Today at 08:00 AM</span>
+              </div>
+            </div>
+
+            <div class="flex gap-3 relative">
+              <span class="absolute top-5 left-2 bottom-0 w-0.5 bg-slate-800"></span>
+              <div class="w-4 h-4 rounded-full bg-amber-500 border-2 border-slate-900 flex items-center justify-center flex-shrink-0 z-10">
+                <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+              </div>
+              <div class="text-xs">
+                <span class="font-semibold text-slate-200 block">Maintenance Flagged (EV-05)</span>
+                <p class="text-[11px] text-slate-400 mt-0.5">Automated battery diag cell scan completed successfully.</p>
+                <span class="text-[10px] text-slate-500 block mt-1">Today at 09:30 AM</span>
+              </div>
+            </div>
+
+            <div class="flex gap-3">
+              <div class="w-4 h-4 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center flex-shrink-0 z-10">
+                <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+              </div>
+              <div class="text-xs">
+                <span class="font-semibold text-slate-200 block">Fuel Log Filed (v-02)</span>
+                <p class="text-[11px] text-slate-400 mt-0.5">Electric semi fuel charge log filed - 297 kWh recorded.</p>
+                <span class="text-[10px] text-slate-500 block mt-1">Yesterday at 04:15 PM</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Layout controller scripts -->
+  <script src="/components/layout.js"></script>
+  <!-- Main dashboard telematics loader -->
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
