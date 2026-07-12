@@ -3,6 +3,11 @@
 TransitOps AI is an enterprise-grade transit dispatcher, transport optimizer, and predictive maintenance platform fully localized for India. It operates as a high-fidelity full-stack application leveraging a custom Node.js/Express backend integrated with modern REST APIs and a responsive, glassmorphic frontend utilizing OpenStreetMap/Leaflet maps, dynamic charting, and a twin-state Dark/Light theme engine.
 
 ---
+## 🌐 Live Demo
+
+**Application URL:**  
+https://transitops-ai-il5f.onrender.com/
+
 
 ## 🛠️ Backend Architecture (Built & Ready)
 
