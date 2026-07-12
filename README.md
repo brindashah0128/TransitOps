@@ -6,7 +6,7 @@ TransitOps AI is an enterprise-grade transit dispatcher, transport optimizer, an
 ## 🌐 Live Demo
 
 **Application URL:**  
-https://transitops-ai-il5f.onrender.com
+https://transitops-ai-il5f.onrender.com/
 
 
 ## 🛠️ Backend Architecture (Built & Ready)
